@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth';
 import { MeetingsListHeader } from '@/modules/meetings/ui/components/meetings-list-header';
 import {
   MeetingsView,
-  MeetingsViewErorr,
+  MeetingsViewError,
   MeetingsViewLoading
 } from '@/modules/meetings/ui/views/meetings-view';
 import { getQueryClient, trpc } from '@/trpc/server';
@@ -29,7 +29,7 @@ const Page = async () => {
       <MeetingsListHeader />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<MeetingsViewLoading />}>
-          <ErrorBoundary fallback={<MeetingsViewErorr />}>
+          <ErrorBoundary fallback={<MeetingsViewError />}>
             <MeetingsView />
           </ErrorBoundary>
         </Suspense>

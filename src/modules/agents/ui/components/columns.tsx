@@ -4,9 +4,9 @@ import { GeneratedAvatar } from '@/components/generated-avatar';
 import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import { CornerDownRightIcon, VideoIcon } from 'lucide-react';
-import { AgentGetOne } from '../../types';
+import { AgentsGetMany } from '../../types';
 
-export const columns: ColumnDef<AgentGetOne>[] = [
+export const columns: ColumnDef<AgentsGetMany[number]>[] = [
   {
     accessorKey: 'name',
     header: 'Agent Name',
@@ -34,7 +34,10 @@ export const columns: ColumnDef<AgentGetOne>[] = [
     accessorKey: 'meetingCount',
     header: 'Meetings',
     cell: ({ row }) => (
-      <Badge variant='outline' className='flex items-center gap-x-2 [&>svg]:size-4'>
+      <Badge
+        variant='outline'
+        className='flex items-center gap-x-2 [&>svg]:size-4'
+      >
         <VideoIcon className='text-blue-700' />
         {row.original.meetingCount}{' '}
         {row.original.meetingCount === 1 ? 'meeting' : 'meetings'}
