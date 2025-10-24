@@ -90,7 +90,7 @@ export const meeting = pgTable('meeting', {
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-  agenId: text('agent_id')
+  agentId: text('agent_id')
     .notNull()
     .references(() => agent.id, { onDelete: 'cascade' }),
   status: meetingStatus('status').notNull().default('upcoming'),

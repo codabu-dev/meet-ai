@@ -10,6 +10,7 @@ import { createTRPCRouter, protectedProcedure } from '@/trpc/init';
 import { TRPCError } from '@trpc/server';
 import { and, count, desc, eq, ilike } from 'drizzle-orm';
 import z from 'zod';
+import { meetingsInsertSchema, meetingsUpdateSchema } from '../schemas';
 
 export const meetingsRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -74,32 +75,39 @@ export const meetingsRouter = createTRPCRouter({
         total: total.count,
         totalPages: totalPages
       };
+    }),
+  create: protectedProcedure
+    .input(meetingsInsertSchema)
+    .mutation(async ({ input, ctx }) => {
+      const [createdMeeting] = await db
+        .insert(meeting)
+        .values({ ...input, userId: ctx.auth.user.id })
+        .returning();
+
+      // TODO: Create Stream Call, Upsert Stream Users
+
+      return createdMeeting;
+    }),
+  update: protectedProcedure
+    .input(meetingsUpdateSchema)
+    .mutation(async ({ ctx, input }) => {
+       const [updatedMeeting] = await db
+        .update(meeting)
+        .set(input)
+        .where(
+          and(eq(meeting.id, input.id), eq(meeting.userId, ctx.auth.user.id))
+        )
+        .returning();
+
+      if (!updatedMeeting) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Meeting not found'
+        });
+      }
+
+      return updatedMeeting;
     })
-  //   create: protectedProcedure
-  //     .input(agentsInsertSchema)
-  //     .mutation(async ({ input, ctx }) => {
-  //       const [createdAgent] = await db
-  //         .insert(agent)
-  //         .values({ ...input, userId: ctx.auth.user.id })
-  //         .returning();
-
-  //       return createdAgent;
-  //     }),
-  //   update: protectedProcedure
-  //     .input(agentsUpdateSchema)
-  //     .mutation(async ({ ctx, input }) => {
-  //       const [updatedAgent] = await db
-  //         .update(agent)
-  //         .set(input)
-  //         .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.auth.user.id)))
-  //         .returning();
-
-  //       if (!updatedAgent) {
-  //         throw new TRPCError({ code: 'NOT_FOUND', message: 'Agent not found' });
-  //       }
-
-  //       return updatedAgent;
-  //     }),
 
   //   remove: protectedProcedure
   //     .input(z.object({ id: z.string() }))
