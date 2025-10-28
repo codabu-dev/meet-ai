@@ -35,9 +35,13 @@ export const AgentIdView = ({ agentId }: Props) => {
 
   const removeAgent = useMutation(
     trpc.agents.remove.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}));
-        // TODO: Invalidate free tier usage
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(
+          trpc.agents.getMany.queryOptions({})
+        );
+        await queryClient.invalidateQueries(
+          trpc.premium.getFreeUsage.queryOptions()
+        );
         router.push('/agents');
       },
       onError: (error) => {
@@ -67,7 +71,7 @@ export const AgentIdView = ({ agentId }: Props) => {
         onOpenChange={setUpdateAgentDialogOpen}
         initialValues={data}
       />
-      
+
       <div className='flex-1 py-4 md:px-8 flex flex-col gap-y-4'>
         <AgentIdViewHeader
           agentId={agentId}

@@ -1,3 +1,4 @@
+import { GeneratedAvatar } from '@/components/generated-avatar';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,12 +13,11 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
   DropdownMenuItem,
-  DropdownMenuSeparator
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { GeneratedAvatar } from '@/components/generated-avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { authClient } from '@/lib/auth-client';
 import { ChevronDownIcon, CreditCardIcon, LogOutIcon } from 'lucide-react';
@@ -73,7 +73,10 @@ const DashboardUserButton = () => {
           </DrawerHeader>
 
           <DrawerFooter>
-            <Button variant='outline' onClick={() => {}}>
+            <Button
+              variant='outline'
+              onClick={() => authClient.customer.portal()}
+            >
               <CreditCardIcon className='size-4 text-black' />
               Billing
             </Button>
@@ -120,7 +123,10 @@ const DashboardUserButton = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className='cursor-pointer flex items-center justify-between'>
+        <DropdownMenuItem
+          onClick={() => authClient.customer.portal()}
+          className='cursor-pointer flex items-center justify-between'
+        >
           Billing
           <CreditCardIcon className='size-4' />
         </DropdownMenuItem>

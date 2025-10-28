@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useTRPC } from '@/trpc/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -27,6 +28,7 @@ interface Props {
 
 export const AgentForm = ({ onSuccess, onCancel, initialValues }: Props) => {
   const trpc = useTRPC();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const createAgent = useMutation(
@@ -35,12 +37,17 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: Props) => {
         await queryClient.invalidateQueries(
           trpc.agents.getMany.queryOptions({})
         );
-
-        // TOOD: invalidate free tier usage
+        await queryClient.invalidateQueries(
+          trpc.premium.getFreeUsage.queryOptions()
+        );
         onSuccess?.();
       },
       onError: (error) => {
         toast.error(error.message);
+
+        if (error.data?.code === 'FORBIDDEN') {
+          router.push('/upgrade');
+        }
       }
     })
   );
@@ -61,8 +68,6 @@ export const AgentForm = ({ onSuccess, onCancel, initialValues }: Props) => {
       },
       onError: (error) => {
         toast.error(error.message);
-
-        // TODO: Check if error code os 'FORBIDDEN', redirect to '/upgrade'
       }
     })
   );
