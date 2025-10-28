@@ -80,8 +80,6 @@ export const MeetingForm = ({ onSuccess, onCancel, initialValues }: Props) => {
       },
       onError: (error) => {
         toast.error(error.message);
-
-        // TODO: Check if error code os 'FORBIDDEN', redirect to '/upgrade'
       }
     })
   );

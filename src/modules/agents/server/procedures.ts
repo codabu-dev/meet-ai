@@ -5,14 +5,14 @@ import {
   MIN_PAGE_SIZE
 } from '@/constants';
 import { db } from '@/db';
-import { agent } from '@/db/schema';
+import { agent, meeting } from '@/db/schema';
 import {
   createTRPCRouter,
   premiumProcedure,
   protectedProcedure
 } from '@/trpc/init';
 import { TRPCError } from '@trpc/server';
-import { and, count, desc, eq, getTableColumns, ilike, sql } from 'drizzle-orm';
+import { and, count, desc, eq, getTableColumns, ilike } from 'drizzle-orm';
 import z from 'zod';
 import { agentsInsertSchema, agentsUpdateSchema } from '../schemas';
 
@@ -23,7 +23,7 @@ export const agentsRouter = createTRPCRouter({
       const [existingAgent] = await db
         .select({
           ...getTableColumns(agent),
-          meetingCount: sql<number>`5`
+          meetingCount: db.$count(meeting, eq(agent.id, meeting.agentId))
         })
         .from(agent)
         .where(and(eq(agent.id, input.id), eq(agent.userId, ctx.auth.user.id)));
@@ -50,13 +50,13 @@ export const agentsRouter = createTRPCRouter({
       const data = await db
         .select({
           ...getTableColumns(agent),
-          meetingCount: sql<number>`5`
+          meetingCount: db.$count(meeting, eq(agent.id, meeting.agentId))
         })
         .from(agent)
         .where(
           and(
             eq(agent.userId, ctx.auth.user.id),
-            search ? ilike(agent.name, `%${search}`) : undefined
+            search ? ilike(agent.name, `%${search}%`) : undefined
           )
         )
         .orderBy(desc(agent.createdAt), desc(agent.id))
@@ -69,7 +69,7 @@ export const agentsRouter = createTRPCRouter({
         .where(
           and(
             eq(agent.userId, ctx.auth.user.id),
-            search ? ilike(agent.name, `%${search}`) : undefined
+            search ? ilike(agent.name, `%${search}%`) : undefined
           )
         );
 
