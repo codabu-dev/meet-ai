@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
 
     await db
       .update(meeting)
-      .set({ status: 'processing' })
+      .set({ status: 'processing', endedAt: new Date() })
       .where(and(eq(meeting.id, meetingId), eq(meeting.status, 'active')));
   } else if (eventType === 'call.transcription_ready') {
     const event = payload as CallTranscriptionReadyEvent;
